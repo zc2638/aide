@@ -27,19 +27,19 @@ func main() {
 	_ = a.Run(context.Background())
 }
 
-func check() aide.StepResultFunc {
+func check() aide.StepFunc {
 	return func(ctx *aide.StepContext) {
 		ctx.WriteString("check Port 31181 OK.")
 	}
 }
 
-func install() aide.StepResultFunc {
+func install() aide.StepFunc {
 	return func(ctx *aide.StepContext) {
 		ctx.WriteString("Install Component Successful.")
 	}
 }
 
-func health() aide.StepResultFunc {
+func health() aide.StepFunc {
 	return func(ctx *aide.StepContext) {
 		ctx.Exit(1)
 		ctx.WriteString("component unhealthy.")

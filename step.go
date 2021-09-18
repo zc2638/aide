@@ -25,10 +25,10 @@ import (
 
 type Step struct {
 	name string
-	srf  StepResultFunc
+	srf  StepFunc
 }
 
-func (s *Step) SetResultFunc(srf StepResultFunc) *Step {
+func (s *Step) SetFunc(srf StepFunc) *Step {
 	s.srf = srf
 	return s
 }
@@ -94,13 +94,13 @@ func (c *StepContext) Context() context.Context {
 
 func (c *StepContext) WithContext(ctx context.Context) {
 	if ctx == nil {
-		panic("nil context")
+		return
 	}
 	c.ctx = ctx
 }
 
-type StepResultFunc func(ctx *StepContext)
+type StepFunc func(sc *StepContext)
 
-func (f StepResultFunc) Step(name string) *Step {
+func (f StepFunc) Step(name string) *Step {
 	return &Step{name: name, srf: f}
 }
