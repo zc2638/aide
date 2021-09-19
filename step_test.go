@@ -108,7 +108,7 @@ func TestStepContext_SetLevel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &StepContext{}
-			c.SetLevel(tt.args.level)
+			c.WithLevel(tt.args.level)
 			if c.level != tt.want {
 				t.Errorf("StepContext_SetLevel() = %v, want %v", c.level, tt.want)
 			}

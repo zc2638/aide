@@ -69,12 +69,20 @@ type StepContext struct {
 	message string
 }
 
-func (c *StepContext) SetLevel(level LogLevel) {
-	c.level = level
+func (c *StepContext) clear() {
+	c.level = Unknown
+	c.message = ""
+	c.exitCode = 0
 }
 
-func (c *StepContext) Exit(code int32) {
+func (c *StepContext) WithLevel(level LogLevel) *StepContext {
+	c.level = level
+	return c
+}
+
+func (c *StepContext) Exit(code int32) *StepContext {
 	c.exitCode = code
+	return c
 }
 
 func (c *StepContext) Write(b []byte) {

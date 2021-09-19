@@ -43,6 +43,7 @@ func (s *Stage) run(ctx context.Context) error {
 	Output(InfoLevel, stagePrefixFormat, s.name)
 	sc := &StepContext{ctx: ctx}
 	for _, step := range s.steps {
+		sc.clear()
 		if err := step.run(sc); err != nil {
 			return err
 		}

@@ -19,6 +19,7 @@ func main() {
 		install().Step("install"),
 	)
 	third := aide.NewStage("third").AddSteps(
+		tip().Step("tip"),
 		health().Step("health check"),
 	)
 
@@ -28,20 +29,25 @@ func main() {
 }
 
 func check() aide.StepFunc {
-	return func(ctx *aide.StepContext) {
-		ctx.WriteString("check Port 31181 OK.")
+	return func(sc *aide.StepContext) {
+		sc.WriteString("check Port 31181 OK.")
 	}
 }
 
 func install() aide.StepFunc {
-	return func(ctx *aide.StepContext) {
-		ctx.WriteString("Install Component Successful.")
+	return func(sc *aide.StepContext) {
+		sc.WriteString("Install Component Successful.")
+	}
+}
+
+func tip() aide.StepFunc {
+	return func(sc *aide.StepContext) {
+		sc.WithLevel(aide.WarnLevel).WriteString("There is an exception.")
 	}
 }
 
 func health() aide.StepFunc {
-	return func(ctx *aide.StepContext) {
-		ctx.Exit(1)
-		ctx.WriteString("component unhealthy.")
+	return func(sc *aide.StepContext) {
+		sc.Exit(1).WriteString("component unhealthy.")
 	}
 }

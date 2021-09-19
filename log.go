@@ -21,7 +21,7 @@ import "github.com/sirupsen/logrus"
 type LogLevel int
 
 const (
-	_ LogLevel = iota
+	Unknown LogLevel = iota
 	// ErrorLevel level. Logs. Used for errors that should definitely be noted.
 	// Commonly used for hooks to send errors to an error tracking service.
 	ErrorLevel
