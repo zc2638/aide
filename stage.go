@@ -18,6 +18,8 @@ package aide
 
 import (
 	"context"
+	"reflect"
+	"runtime"
 )
 
 type Stage struct {
@@ -35,6 +37,14 @@ func (s *Stage) AddSteps(steps ...*Step) *Stage {
 			continue
 		}
 		s.steps = append(s.steps, *step)
+	}
+	return s
+}
+
+func (s *Stage) AddStepFuncs(sfs ...StepFunc) *Stage {
+	for _, sf := range sfs {
+		fc := runtime.FuncForPC(reflect.ValueOf(sf).Pointer())
+		s.AddSteps(sf.Step(fc.Name()))
 	}
 	return s
 }

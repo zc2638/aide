@@ -10,11 +10,10 @@ import (
 
 func main() {
 	first := aide.NewStage("first").AddSteps(
-		check().Step("check"),
-		check().Step("check"),
-		check().Step("check"),
-		check().Step("check"),
-	)
+		aide.StepFunc(check).Step("check"),
+		aide.StepFunc(check).Step("check"),
+		aide.StepFunc(check).Step("check"),
+	).AddStepFuncs(check)
 	second := aide.NewStage("second").AddSteps(
 		install().Step("install"),
 	)
@@ -23,16 +22,17 @@ func main() {
 		health().Step("health check"),
 		unreachable().Step("unreachable"),
 	)
+	fourth := aide.NewStage("fourth").AddStepFuncs(
+		unreachableStage,
+	)
 
 	a := aide.New()
-	a.AddStages(first, second, third)
+	a.AddStages(first, second, third, fourth)
 	_ = a.Run(context.Background())
 }
 
-func check() aide.StepFunc {
-	return func(sc *aide.StepContext) {
-		sc.WriteString("check Port 31181 OK.")
-	}
+func check(sc *aide.StepContext) {
+	sc.WriteString("check Port 31181 OK.")
 }
 
 func install() aide.StepFunc {
@@ -57,4 +57,8 @@ func unreachable() aide.StepFunc {
 	return func(sc *aide.StepContext) {
 		sc.WriteString("unreachable.")
 	}
+}
+
+func unreachableStage(sc *aide.StepContext) {
+	sc.WriteString("unreachable stage.")
 }
