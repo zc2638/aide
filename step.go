@@ -55,6 +55,9 @@ func (s *Step) run(sc *StepContext) error {
 		OutputErr(sc.level, "%s %s", prefix, message)
 		return errors.New(message)
 	}
+	if sc.level == Unknown {
+		sc.level = InfoLevel
+	}
 	Output(sc.level, "%s %s", prefix, message)
 	return nil
 }
@@ -70,7 +73,7 @@ type StepContext struct {
 }
 
 func (c *StepContext) clear() {
-	c.level = InfoLevel
+	c.level = Unknown
 	c.message = ""
 	c.exitCode = 0
 }

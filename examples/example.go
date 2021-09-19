@@ -21,6 +21,7 @@ func main() {
 	third := aide.NewStage("third").AddSteps(
 		tip().Step("tip"),
 		health().Step("health check"),
+		unreachable().Step("unreachable"),
 	)
 
 	a := aide.New()
@@ -49,5 +50,11 @@ func tip() aide.StepFunc {
 func health() aide.StepFunc {
 	return func(sc *aide.StepContext) {
 		sc.Exit(1).WriteString("component unhealthy.")
+	}
+}
+
+func unreachable() aide.StepFunc {
+	return func(sc *aide.StepContext) {
+		sc.WriteString("unreachable.")
 	}
 }
