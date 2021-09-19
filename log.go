@@ -16,7 +16,11 @@
 
 package aide
 
-import "github.com/sirupsen/logrus"
+import (
+	"fmt"
+
+	"github.com/sirupsen/logrus"
+)
 
 type LogLevel int
 
@@ -37,8 +41,9 @@ func init() {
 		ForceColors:            true,
 		DisableLevelTruncation: true,
 		PadLevelText:           true,
-		FullTimestamp:          true,
-		TimestampFormat:        "2006/01/02 15:04:05",
+		DisableTimestamp:       true,
+		//FullTimestamp:          true,
+		//TimestampFormat: "2006/01/02 15:04:05",
 	})
 }
 
@@ -51,7 +56,7 @@ func Output(level LogLevel, format string, args ...interface{}) {
 	case InfoLevel:
 		logrus.Infof(format, args...)
 	default:
-		logrus.Infof(format, args...)
+		fmt.Println(fmt.Sprintf(format, args...))
 	}
 }
 

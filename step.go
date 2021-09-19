@@ -70,7 +70,7 @@ type StepContext struct {
 }
 
 func (c *StepContext) clear() {
-	c.level = Unknown
+	c.level = InfoLevel
 	c.message = ""
 	c.exitCode = 0
 }

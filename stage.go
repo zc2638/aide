@@ -40,7 +40,7 @@ func (s *Stage) AddSteps(steps ...*Step) *Stage {
 }
 
 func (s *Stage) run(ctx context.Context) error {
-	Output(InfoLevel, stagePrefixFormat, s.name)
+	Output(Unknown, stagePrefixFormat, s.name)
 	sc := &StepContext{ctx: ctx}
 	for _, step := range s.steps {
 		sc.clear()
