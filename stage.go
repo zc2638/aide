@@ -17,18 +17,46 @@
 package aide
 
 import (
-	"context"
+	"fmt"
 	"reflect"
 	"runtime"
+
+	"github.com/99nil/go/stage"
 )
 
 type Stage struct {
-	name  string
-	steps []Step
+	name     string
+	total    int
+	instance *stage.Instance
 }
 
 func NewStage(name string) *Stage {
-	return &Stage{name: name}
+	s := &Stage{name: name}
+	s.instance = stage.New(name).
+		SetPreFunc(func(sc stage.Context) error {
+			sc.WithValue(StepTotalKey, s.total)
+			stageName := stage.ContextName(sc)
+			logf(Unknown, "%s STAGE %s", stageSymbol, stageName)
+			return nil
+		}).
+		SetSubFunc(sub)
+	return s
+}
+
+func sub(_ stage.Context) error {
+	fmt.Println()
+	return nil
+}
+
+// TODO asynchronous support in the future
+//func (s *Stage) SetAsync(async bool) *Stage {
+//	s.instance.SetAsync(async)
+//	return s
+//}
+
+func (s *Stage) SetRely(names ...string) *Stage {
+	s.instance.SetRely(names...)
+	return s
 }
 
 func (s *Stage) AddSteps(steps ...*Step) *Stage {
@@ -36,7 +64,9 @@ func (s *Stage) AddSteps(steps ...*Step) *Stage {
 		if step == nil {
 			continue
 		}
-		s.steps = append(s.steps, *step)
+		s.total++
+		step.num = s.total
+		s.instance.Add(step.instance)
 	}
 	return s
 }
@@ -47,16 +77,4 @@ func (s *Stage) AddStepFuncs(sfs ...StepFunc) *Stage {
 		s.AddSteps(sf.Step(fc.Name()))
 	}
 	return s
-}
-
-func (s *Stage) run(ctx context.Context) error {
-	Output(Unknown, stagePrefixFormat, s.name)
-	sc := &StepContext{ctx: ctx}
-	for _, step := range s.steps {
-		sc.clear()
-		if err := step.run(sc); err != nil {
-			return err
-		}
-	}
-	return nil
 }

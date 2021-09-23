@@ -16,41 +16,20 @@
 
 package aide
 
-import (
-	"context"
+// contextKey is a value for use with context.WithValue. It's used as
+// a pointer, so it fits in an interface{} without allocation. This technique
+// for defining context keys was copied from Go 1.7's new use of context in net/http.
+type contextKey struct {
+	name string
+}
 
-	"github.com/99nil/go/stage"
+func (k *contextKey) String() string {
+	return "aide context value " + k.name
+}
+
+var (
+	// StepCtxKey is the context.Context key to store the step context.
+	StepCtxKey = &contextKey{"StepContext"}
+	// StepTotalKey is the context.Context key to store the total number of steps.
+	StepTotalKey = &contextKey{"StepTotal"}
 )
-
-const (
-	stageSymbol = "[+]"
-	stepSymbol  = "=>"
-)
-
-type Instance struct {
-	instance *stage.Instance
-}
-
-func New() *Instance {
-	ins := stage.New("")
-	return &Instance{
-		instance: ins,
-	}
-}
-
-func (i *Instance) AddStages(stages ...*Stage) *Instance {
-	for _, s := range stages {
-		if s == nil {
-			continue
-		}
-		i.instance.Add(s.instance)
-	}
-	return i
-}
-
-func (i *Instance) Run(ctx context.Context) error {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	return i.instance.Run(ctx)
-}

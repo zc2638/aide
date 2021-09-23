@@ -18,6 +18,7 @@ package aide
 
 import (
 	"fmt"
+	"unicode"
 
 	"github.com/sirupsen/logrus"
 )
@@ -47,7 +48,20 @@ func init() {
 	})
 }
 
-func Output(level LogLevel, format string, args ...interface{}) {
+func log(level LogLevel, args ...interface{}) {
+	switch level {
+	case ErrorLevel:
+		logrus.Error(args...)
+	case WarnLevel:
+		logrus.Warning(args...)
+	case InfoLevel:
+		logrus.Info(args...)
+	default:
+		fmt.Println(args...)
+	}
+}
+
+func logf(level LogLevel, format string, args ...interface{}) {
 	switch level {
 	case ErrorLevel:
 		logrus.Errorf(format, args...)
@@ -60,13 +74,13 @@ func Output(level LogLevel, format string, args ...interface{}) {
 	}
 }
 
-func OutputErr(level LogLevel, format string, args ...interface{}) {
-	switch level {
-	case ErrorLevel:
-	case WarnLevel:
-	case InfoLevel:
-	default:
-		level = ErrorLevel
+func standardMessage(s string) string {
+	if s != "" {
+		rs := []rune(s)
+		if unicode.IsLetter(rs[0]) && !unicode.IsUpper(rs[0]) {
+			rs[0] = unicode.ToUpper(rs[0])
+		}
+		s = string(rs)
 	}
-	Output(level, format, args...)
+	return s
 }

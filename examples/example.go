@@ -4,16 +4,19 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/zc2638/aide"
 )
 
 func main() {
-	first := aide.NewStage("first").AddSteps(
-		aide.StepFunc(check).Step("check"),
-		aide.StepFunc(check).Step("check"),
-		aide.StepFunc(check).Step("check"),
-	).AddStepFuncs(check)
+	first := aide.NewStage("first").
+		AddSteps(
+			aide.StepFunc(check).Step("check1"),
+			aide.StepFunc(check).Step("check2"),
+			aide.StepFunc(check).Step("check3"),
+		).
+		AddStepFuncs(check)
 	second := aide.NewStage("second").AddSteps(
 		install().Step("install"),
 	)
@@ -32,33 +35,36 @@ func main() {
 }
 
 func check(sc *aide.StepContext) {
-	sc.WriteString("check Port 31181 OK.")
+	sc.Return("check Port 31181 OK.")
 }
 
 func install() aide.StepFunc {
 	return func(sc *aide.StepContext) {
-		sc.WriteString("Install Component Successful.")
+		sc.Log("ceshi log")
+		sc.Return("Install Component Successful.")
 	}
 }
 
 func tip() aide.StepFunc {
 	return func(sc *aide.StepContext) {
-		sc.WithLevel(aide.WarnLevel).WriteString("There is an exception.")
+		sc.Context().WithValue("test", "context test")
+		sc.Return("There is an exception.")
 	}
 }
 
 func health() aide.StepFunc {
 	return func(sc *aide.StepContext) {
-		sc.Exit(1).WriteString("component unhealthy.")
+		fmt.Println(sc.Context().Value("test"))
+		sc.Break("component unhealthy.")
 	}
 }
 
 func unreachable() aide.StepFunc {
 	return func(sc *aide.StepContext) {
-		sc.WriteString("unreachable.")
+		sc.Message("unreachable.")
 	}
 }
 
 func unreachableStage(sc *aide.StepContext) {
-	sc.WriteString("unreachable stage.")
+	sc.Message("unreachable stage.")
 }
