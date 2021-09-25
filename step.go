@@ -21,7 +21,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/99nil/go/stage"
+	"github.com/zc2638/aide/stage"
 )
 
 type Step struct {
@@ -34,6 +34,11 @@ type Step struct {
 func (s *Step) SetRely(names ...string) *Step {
 	s.instance.SetRely(names...)
 	return s
+}
+
+func (c *Step) Goto(name string) *Step {
+	c.instance.Goto(name)
+	return c
 }
 
 func (s *Step) SetFunc(srf StepFunc) *Step {

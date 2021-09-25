@@ -21,7 +21,7 @@ import (
 	"reflect"
 	"runtime"
 
-	"github.com/99nil/go/stage"
+	"github.com/zc2638/aide/stage"
 )
 
 type Stage struct {

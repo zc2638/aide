@@ -1,4 +1,4 @@
-// Package aide
+// Package stage
 
 // Copyright © 2021 zc2638 <zc2638@qq.com>.
 //
@@ -14,43 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package aide
+package stage
 
-import (
-	"context"
+type Error string
 
-	"github.com/zc2638/aide/stage"
-)
-
-const (
-	stageSymbol = "[+]"
-	stepSymbol  = "=>"
-)
-
-type Instance struct {
-	instance *stage.Instance
+func (e Error) Error() string {
+	return string(e)
 }
 
-func New() *Instance {
-	ins := stage.New("")
-	return &Instance{
-		instance: ins,
-	}
-}
-
-func (i *Instance) AddStages(stages ...*Stage) *Instance {
-	for _, s := range stages {
-		if s == nil {
-			continue
-		}
-		i.instance.Add(s.instance)
-	}
-	return i
-}
-
-func (i *Instance) Run(ctx context.Context) error {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	return i.instance.Run(ctx)
-}
+const ErrStageSkip = Error("stage skip")

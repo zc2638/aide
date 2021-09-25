@@ -1,13 +1,5 @@
-github.com/99nil/go v0.0.0-20210920125955-f47b956b4972 h1:9K28xUmFVeJduyaFh8QQGV5CX2MbqJ5/Tn7VhyHG+rw=
-github.com/99nil/go v0.0.0-20210920125955-f47b956b4972/go.mod h1:J/4Ei0TEJTTxM8z9WbenTh6pIElunP1px7yV+61dgP4=
-github.com/99nil/go v0.0.0-20210920134118-94606c853d31 h1:Jl7efcx8STjKbuxlCMij+/VE1PP7397dSkCHXeqUKp4=
-github.com/99nil/go v0.0.0-20210920134118-94606c853d31/go.mod h1:J/4Ei0TEJTTxM8z9WbenTh6pIElunP1px7yV+61dgP4=
-github.com/99nil/go v0.0.0-20210921080516-48339bd5d9a3 h1:Div5AXSNQxTJQhVsp7MllDORtMFAM1JpgMJmLYmucQI=
-github.com/99nil/go v0.0.0-20210921080516-48339bd5d9a3/go.mod h1:J/4Ei0TEJTTxM8z9WbenTh6pIElunP1px7yV+61dgP4=
-github.com/99nil/go v0.0.0-20210921083556-d3c00b203f9d h1:c0Qxu7E/yqfJSCbnBfD9zLydWxVI39x3zICXfRnPFEA=
-github.com/99nil/go v0.0.0-20210921083556-d3c00b203f9d/go.mod h1:J/4Ei0TEJTTxM8z9WbenTh6pIElunP1px7yV+61dgP4=
-github.com/99nil/go v0.0.0-20210923083611-d5dee310f104 h1:+mTY0AotXGNXe9he8Wg2PqFsm2Lx/gYVeQrlbqJ/p4w=
-github.com/99nil/go v0.0.0-20210923083611-d5dee310f104/go.mod h1:J/4Ei0TEJTTxM8z9WbenTh6pIElunP1px7yV+61dgP4=
+github.com/99nil/go v0.0.0-20210924013233-ebd290da12d6 h1:tU1UpYa5ao+4ht21gk02VCP4EDzupUffWya3xIH/euQ=
+github.com/99nil/go v0.0.0-20210924013233-ebd290da12d6/go.mod h1:J/4Ei0TEJTTxM8z9WbenTh6pIElunP1px7yV+61dgP4=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
