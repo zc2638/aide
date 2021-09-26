@@ -19,6 +19,7 @@ package aide
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os/exec"
 
 	"github.com/zc2638/aide/stage"
@@ -139,6 +140,12 @@ func (c *StepContext) ErrorStr(s string) {
 // Error exits all execution and return a error.
 func (c *StepContext) Error(err error) {
 	c.err = err
+	c.Exit()
+}
+
+// Errorf exits all execution and return a error by format.
+func (c *StepContext) Errorf(format string, args ...interface{}) {
+	c.err = fmt.Errorf(format, args...)
 	c.Exit()
 }
 
