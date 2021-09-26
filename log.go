@@ -18,6 +18,7 @@ package aide
 
 import (
 	"fmt"
+	"io"
 	"unicode"
 
 	"github.com/sirupsen/logrus"
@@ -26,6 +27,7 @@ import (
 type LogInterface interface {
 	Log(level LogLevel, args ...interface{})
 	Logf(level LogLevel, format string, args ...interface{})
+	Writer() io.Writer
 }
 
 type LogLevel int
@@ -53,10 +55,14 @@ func init() {
 	})
 }
 
-var DefaultLog = &defaultLog{entry: logrus.StandardLogger()}
+var DefaultLog LogInterface = &defaultLog{entry: logrus.StandardLogger()}
 
 type defaultLog struct {
 	entry *logrus.Logger
+}
+
+func (l *defaultLog) Writer() io.Writer {
+	return l.entry.Out
 }
 
 func (l *defaultLog) Log(level LogLevel, args ...interface{}) {
