@@ -16,10 +16,13 @@
 
 package stage
 
-type Error string
+type stageError string
 
-func (e Error) Error() string {
+func (e stageError) Error() string {
 	return string(e)
 }
 
-const ErrStageSkip = Error("stage skip")
+const (
+	ErrStageSkip = stageError("stage skip")
+	ErrStageEnd  = stageError("stage end")
+)

@@ -92,8 +92,8 @@ func (ins *Instance) SetSubFunc(f InstanceFunc) *Instance {
 	return ins
 }
 
-// SetRely sets the names of other stages that the current stage needs to depend on.
-func (ins *Instance) SetRely(names ...string) *Instance {
+// RelyOn sets the names of other stages that the current stage needs to depend on.
+func (ins *Instance) RelyOn(names ...string) *Instance {
 	ins.relies = make([]string, 0, len(names))
 	ins.relies = append(ins.relies, names...)
 	return ins
@@ -134,7 +134,10 @@ func (ins *Instance) Run(ctx context.Context) error {
 	}
 	// TODO Check for non-existent dependencies.
 	sc := NewCtx(ctx)
-	return ins.run(sc)
+	if err := ins.run(sc); err != nil && err != ErrStageEnd {
+		return err
+	}
+	return nil
 }
 
 func (ins *Instance) run(sc Context) error {

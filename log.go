@@ -23,6 +23,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type LogInterface interface {
+	Log(level LogLevel, args ...interface{})
+	Logf(level LogLevel, format string, args ...interface{})
+}
+
 type LogLevel int
 
 const (
@@ -48,27 +53,33 @@ func init() {
 	})
 }
 
-func log(level LogLevel, args ...interface{}) {
+var DefaultLog = &defaultLog{entry: logrus.StandardLogger()}
+
+type defaultLog struct {
+	entry *logrus.Logger
+}
+
+func (l *defaultLog) Log(level LogLevel, args ...interface{}) {
 	switch level {
 	case ErrorLevel:
-		logrus.Error(args...)
+		l.entry.Errorln(args...)
 	case WarnLevel:
-		logrus.Warning(args...)
+		l.entry.Warningln(args...)
 	case InfoLevel:
-		logrus.Info(args...)
+		l.entry.Infoln(args...)
 	default:
 		fmt.Println(args...)
 	}
 }
 
-func logf(level LogLevel, format string, args ...interface{}) {
+func (l *defaultLog) Logf(level LogLevel, format string, args ...interface{}) {
 	switch level {
 	case ErrorLevel:
-		logrus.Errorf(format, args...)
+		l.entry.Errorf(format, args...)
 	case WarnLevel:
-		logrus.Warningf(format, args...)
+		l.entry.Warningf(format, args...)
 	case InfoLevel:
-		logrus.Infof(format, args...)
+		l.entry.Infof(format, args...)
 	default:
 		fmt.Println(fmt.Sprintf(format, args...))
 	}

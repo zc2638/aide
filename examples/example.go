@@ -35,36 +35,35 @@ func main() {
 }
 
 func check(sc *aide.StepContext) {
-	sc.Return("check Port 31181 OK.")
+	sc.Log("check Port 31181 OK.")
 }
 
 func install() aide.StepFunc {
 	return func(sc *aide.StepContext) {
-		sc.Log("ceshi log")
-		sc.Return("Install Component Successful.")
+		sc.Log("Install Component Successful.")
 	}
 }
 
 func tip() aide.StepFunc {
 	return func(sc *aide.StepContext) {
 		sc.Context().WithValue("test", "context test")
-		sc.Return("There is an exception.")
+		sc.Logl(aide.WarnLevel, "There is an exception.")
 	}
 }
 
 func health() aide.StepFunc {
 	return func(sc *aide.StepContext) {
 		fmt.Println(sc.Context().Value("test"))
-		sc.Break("component unhealthy.")
+		sc.ErrorStr("component unhealthy.")
 	}
 }
 
 func unreachable() aide.StepFunc {
 	return func(sc *aide.StepContext) {
-		sc.Message("unreachable.")
+		sc.Logl(aide.WarnLevel, "unreachable.")
 	}
 }
 
 func unreachableStage(sc *aide.StepContext) {
-	sc.Message("unreachable stage.")
+	sc.Logl(aide.WarnLevel, "unreachable stage.")
 }

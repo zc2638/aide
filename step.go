@@ -18,7 +18,7 @@ package aide
 
 import (
 	"context"
-	"os"
+	"errors"
 	"os/exec"
 
 	"github.com/zc2638/aide/stage"
@@ -31,14 +31,9 @@ type Step struct {
 	instance *stage.Instance
 }
 
-func (s *Step) SetRely(names ...string) *Step {
-	s.instance.SetRely(names...)
+func (s *Step) RelyOn(names ...string) *Step {
+	s.instance.RelyOn(names...)
 	return s
-}
-
-func (c *Step) Goto(name string) *Step {
-	c.instance.Goto(name)
-	return c
 }
 
 func (s *Step) SetFunc(srf StepFunc) *Step {
@@ -49,24 +44,40 @@ func (s *Step) SetFunc(srf StepFunc) *Step {
 			total = s.num
 		}
 		name := stage.ContextName(sc)
-		logf(Unknown, "%s [%d/%d] %s", stepSymbol, s.num, total, name)
+		DefaultLog.Logf(Unknown, "%s [%d/%d] %s", stepSymbol, s.num, total, name)
 		return nil
 	})
-	s.instance.SetSubFunc(func(sc stage.Context) error {
-		stepCtx, ok := sc.Value(StepCtxKey).(*StepContext)
-		if !ok {
-			stepCtx = &StepContext{ctx: sc}
-		}
-		return s.run(stepCtx)
-	})
+	s.instance.SetSubFunc(s.execute)
 	return s
 }
 
-func (s *Step) run(sc *StepContext) error {
-	//prefix := fmt.Sprintf(stepPrefixFormat, s.name)
+func (s *Step) execute(sc stage.Context) error {
+	stepCtx, ok := sc.Value(StepCtxKey).(*StepContext)
+	if !ok {
+		stepCtx = &StepContext{ctx: sc}
+	}
+	s.run(stepCtx)
+
+	if stepCtx.err != nil {
+		level := stepCtx.level
+
+		switch level {
+		case ErrorLevel:
+		case WarnLevel:
+		case InfoLevel:
+		default:
+			level = ErrorLevel
+		}
+		if stepCtx.err != stage.ErrStageEnd {
+			DefaultLog.Logf(level, "%s", standardMessage(stepCtx.err.Error()))
+		}
+	}
+	return stepCtx.err
+}
+
+func (s *Step) run(sc *StepContext) {
 	if s.srf == nil {
-		logf(InfoLevel, "%s", "Nothing to run.")
-		return nil
+		return
 	}
 
 	defer func() {
@@ -75,30 +86,13 @@ func (s *Step) run(sc *StepContext) error {
 			if !ok {
 				return
 			}
-			if sc.exitCode > 0 {
-				level := sc.level
-				switch level {
-				case ErrorLevel:
-				case WarnLevel:
-				case InfoLevel:
-				default:
-					level = ErrorLevel
-				}
-				logf(level, "%s", standardMessage(sc.message))
-				// Forced exit according to exit code
-				os.Exit(sc.exitCode)
+			if sc.err == nil {
+				sc.err = stage.ErrStageEnd
 			}
-		}
-		if sc.level == Unknown {
-			sc.level = InfoLevel
-		}
-		if sc.message != "" {
-			log(sc.level, standardMessage(sc.message))
 		}
 	}()
 
 	s.srf(sc)
-	return nil
 }
 
 type StepFunc func(sc *StepContext)
@@ -116,16 +110,13 @@ type StepContext struct {
 	ctx stage.Context
 
 	level LogLevel
-	// exitCode defines the state when an exception exits.
-	exitCode int
-	// message describes execution results
-	message string
+	// err defines the error when an exception exits.
+	err error
 }
 
 func (c *StepContext) clear() {
 	c.level = Unknown
-	c.message = ""
-	c.exitCode = 0
+	c.err = nil
 }
 
 func (c *StepContext) Log(args ...interface{}) {
@@ -137,39 +128,36 @@ func (c *StepContext) Logf(format string, args ...interface{}) {
 }
 
 func (c *StepContext) Logl(level LogLevel, args ...interface{}) {
-	log(level, args...)
+	DefaultLog.Log(level, args...)
 }
 
 func (c *StepContext) Logfl(level LogLevel, format string, args ...interface{}) {
-	logf(level, format, args...)
+	DefaultLog.Logf(level, format, args...)
 }
 
-func (c *StepContext) Message(s string) *StepContext {
-	c.message = s
-	return c
+// ErrorStr exits all execution and return a error by string.
+func (c *StepContext) ErrorStr(s string) {
+	c.Error(errors.New(s))
 }
 
-func (c *StepContext) Return(s string) {
-	c.Message(s).Exit(0)
-}
-
+// Error exits all execution and return a error.
 func (c *StepContext) Error(err error) {
-	c.Break(err.Error())
+	c.err = err
+	c.Exit()
 }
 
-func (c *StepContext) Break(s string) {
-	c.Message(s).Exit(1)
-}
-
-func (c *StepContext) Exit(code int) {
-	c.exitCode = code
+// Exit exits all execution.
+func (c *StepContext) Exit() {
 	panic(c)
 }
 
+// Context returns a stage.Context
 func (c *StepContext) Context() stage.Context {
 	return c.ctx
 }
 
+// WithContext returns a shallow copy of r with its context changed
+// to ctx. The provided ctx must be non-nil.
 func (c *StepContext) WithContext(ctx context.Context) {
 	if ctx == nil {
 		return
@@ -177,6 +165,7 @@ func (c *StepContext) WithContext(ctx context.Context) {
 	c.ctx.WithCtx(ctx)
 }
 
+// Shell helps execute shell scripts.
 func (c *StepContext) Shell(command string) error {
 	cmd := exec.Command("sh", "-c", command)
 	return cmd.Run()

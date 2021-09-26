@@ -28,13 +28,14 @@ const (
 )
 
 type Instance struct {
+	// TODO stage pre logs define
+	// TODO step pre logs define
 	instance *stage.Instance
 }
 
 func New() *Instance {
-	ins := stage.New("")
 	return &Instance{
-		instance: ins,
+		instance: stage.New(""),
 	}
 }
 

@@ -36,7 +36,7 @@ func NewStage(name string) *Stage {
 		SetPreFunc(func(sc stage.Context) error {
 			sc.WithValue(StepTotalKey, s.total)
 			stageName := stage.ContextName(sc)
-			logf(Unknown, "%s STAGE %s", stageSymbol, stageName)
+			DefaultLog.Logf(Unknown, "%s STAGE %s", stageSymbol, stageName)
 			return nil
 		}).
 		SetSubFunc(sub)
@@ -54,8 +54,8 @@ func sub(_ stage.Context) error {
 //	return s
 //}
 
-func (s *Stage) SetRely(names ...string) *Stage {
-	s.instance.SetRely(names...)
+func (s *Stage) RelyOn(names ...string) *Stage {
+	s.instance.RelyOn(names...)
 	return s
 }
 
