@@ -39,12 +39,8 @@ func (s *Step) RelyOn(names ...string) *Step {
 func (s *Step) SetFunc(srf StepFunc) *Step {
 	s.srf = srf
 	s.instance.SetPreFunc(func(sc stage.Context) error {
-		total, ok := sc.Value(StepTotalKey).(int)
-		if !ok {
-			total = s.num
-		}
 		name := stage.ContextName(sc)
-		DefaultLog.Logf(Unknown, "%s [%d/%d] %s", stepSymbol, s.num, total, name)
+		DefaultLog.Logf(Unknown, "%s %s", stepSymbol, name)
 		return nil
 	})
 	s.instance.SetSubFunc(s.execute)
