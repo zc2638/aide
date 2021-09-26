@@ -44,8 +44,15 @@ const (
 	InfoLevel
 )
 
-func init() {
-	logrus.SetFormatter(&logrus.TextFormatter{
+var DefaultLog LogInterface = newLog()
+
+type defaultLog struct {
+	entry *logrus.Logger
+}
+
+func newLog() LogInterface {
+	logger := logrus.New()
+	logger.SetFormatter(&logrus.TextFormatter{
 		ForceColors:            true,
 		DisableLevelTruncation: true,
 		PadLevelText:           true,
@@ -53,12 +60,7 @@ func init() {
 		//FullTimestamp:          true,
 		//TimestampFormat: "2006/01/02 15:04:05",
 	})
-}
-
-var DefaultLog LogInterface = &defaultLog{entry: logrus.StandardLogger()}
-
-type defaultLog struct {
-	entry *logrus.Logger
+	return &defaultLog{entry: logger}
 }
 
 func (l *defaultLog) Writer() io.Writer {
