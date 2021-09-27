@@ -44,7 +44,11 @@ const (
 	InfoLevel
 )
 
-var DefaultLog LogInterface = newLog()
+func init() {
+	DefaultLog = newLog()
+}
+
+var DefaultLog LogInterface
 
 type defaultLog struct {
 	entry *logrus.Logger
