@@ -81,7 +81,7 @@ func (s *Step) run(sc *StepContext) {
 		if v := recover(); v != nil {
 			sc, ok := v.(*StepContext)
 			if !ok {
-				return
+				sc.err = fmt.Errorf("unexpected error: %v", v)
 			}
 			if sc.err == nil {
 				sc.err = stage.ErrStageEnd
