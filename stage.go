@@ -25,9 +25,12 @@ import (
 )
 
 type Stage struct {
+	instance *stage.Instance
+
 	name     string
 	total    int
-	instance *stage.Instance
+	skip     bool
+	skipFunc func() bool
 }
 
 func NewStage(name string) *Stage {
@@ -76,5 +79,15 @@ func (s *Stage) AddStepFuncs(sfs ...StepFunc) *Stage {
 		fc := runtime.FuncForPC(reflect.ValueOf(sf).Pointer())
 		s.AddSteps(sf.Step(fc.Name()))
 	}
+	return s
+}
+
+func (s *Stage) Skip(is bool) *Stage {
+	s.skip = is
+	return s
+}
+
+func (s *Stage) SkipFunc(f func() bool) *Stage {
+	s.skipFunc = f
 	return s
 }

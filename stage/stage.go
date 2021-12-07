@@ -44,6 +44,9 @@ type Instance struct {
 	// After executing the current stage, the name of the next stage that needs to be executed.
 	// Note: other stages between the current stage and the next stage will not be executed.
 	next string
+
+	skip     bool
+	skipFunc func() bool
 }
 
 func New(name string) *Instance {
@@ -64,6 +67,16 @@ func (ins *Instance) rename() {
 
 func (ins *Instance) Len() int {
 	return len(ins.cs)
+}
+
+func (ins *Instance) Skip(is bool) *Instance {
+	ins.skip = is
+	return ins
+}
+
+func (ins *Instance) SkipFunc(f func() bool) *Instance {
+	ins.skipFunc = f
+	return ins
 }
 
 // Add adds subsets
@@ -141,6 +154,13 @@ func (ins *Instance) Run(ctx context.Context) error {
 }
 
 func (ins *Instance) run(sc Context) error {
+	if ins.skip {
+		return nil
+	}
+	if ins.skipFunc != nil && ins.skipFunc() {
+		return nil
+	}
+
 	var err error
 	if ins.pre != nil {
 		sc.WithValue(NameKey, ins.name)

@@ -44,7 +44,8 @@ func (i *Instance) AddStages(stages ...*Stage) *Instance {
 		if s == nil {
 			continue
 		}
-		i.instance.Add(s.instance)
+		ins := s.instance.Skip(s.skip).SkipFunc(s.skipFunc)
+		i.instance.Add(ins)
 	}
 	return i
 }

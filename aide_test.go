@@ -65,13 +65,13 @@ func TestInstance_Run(t *testing.T) {
 	stage2 := NewStage("test2")
 	stage3 := NewStage("test3").AddSteps(
 		StepFunc(func(sc *StepContext) {
-			sc.Return("ok")
+			sc.Log("OK")
 		}).Step("step1"),
 	)
 	stage4 := NewStage("test4").AddSteps(
 		StepFunc(func(sc *StepContext) {
-			sc.Exit(1)
-			sc.Return("failed")
+			sc.Exit()
+			sc.Log("failed")
 		}).Step("step1"),
 	)
 

@@ -117,7 +117,7 @@ func TestStage_run(t *testing.T) {
 		sc.Log("ok")
 	}).Step("step1")
 	step4 := StepFunc(func(sc *StepContext) {
-		sc.Return("failed")
+		sc.Log("failed")
 	}).Step("step1")
 
 	type fields struct {
