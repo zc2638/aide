@@ -26,10 +26,12 @@ import (
 )
 
 type Step struct {
-	name     string
-	num      int
-	srf      StepFunc
 	instance *stage.Instance
+	stage    *Stage
+
+	name string
+	num  int
+	srf  StepFunc
 }
 
 func (s *Step) RelyOn(names ...string) *Step {
@@ -39,11 +41,6 @@ func (s *Step) RelyOn(names ...string) *Step {
 
 func (s *Step) SetFunc(srf StepFunc) *Step {
 	s.srf = srf
-	s.instance.SetPreFunc(func(sc stage.Context) error {
-		name := stage.ContextName(sc)
-		DefaultLog.Logf(Unknown, "%s %s", stepSymbol, name)
-		return nil
-	})
 	s.instance.SetSubFunc(s.execute)
 	return s
 }
@@ -51,7 +48,10 @@ func (s *Step) SetFunc(srf StepFunc) *Step {
 func (s *Step) execute(sc stage.Context) error {
 	stepCtx, ok := sc.Value(StepCtxKey).(*StepContext)
 	if !ok {
-		stepCtx = &StepContext{ctx: sc}
+		stepCtx = &StepContext{
+			ctx:    sc,
+			logger: s.stage.logger,
+		}
 	}
 	s.run(stepCtx)
 
@@ -66,7 +66,7 @@ func (s *Step) execute(sc stage.Context) error {
 			level = ErrorLevel
 		}
 		if stepCtx.err != stage.ErrStageEnd {
-			DefaultLog.Logf(level, "%s", standardMessage(stepCtx.err.Error()))
+			s.stage.logger.Logf(level, "%s", standardMessage(stepCtx.err.Error()))
 		}
 	}
 	return stepCtx.err
@@ -104,7 +104,8 @@ func (f StepFunc) Step(name string) *Step {
 }
 
 type StepContext struct {
-	ctx stage.Context
+	ctx    stage.Context
+	logger LogInterface
 
 	level LogLevel
 	// err defines the error when an exception exits.
@@ -125,11 +126,11 @@ func (c *StepContext) Logf(format string, args ...interface{}) {
 }
 
 func (c *StepContext) Logl(level LogLevel, args ...interface{}) {
-	DefaultLog.Log(level, args...)
+	c.logger.Log(level, args...)
 }
 
 func (c *StepContext) Logfl(level LogLevel, format string, args ...interface{}) {
-	DefaultLog.Logf(level, format, args...)
+	c.logger.Logf(level, format, args...)
 }
 
 // ErrorStr exits all execution and return a error by string.
@@ -171,7 +172,7 @@ func (c *StepContext) WithContext(ctx context.Context) {
 // Shell helps execute shell scripts.
 func (c *StepContext) Shell(command string) error {
 	cmd := exec.CommandContext(c.Context(), "sh", "-c", command)
-	cmd.Stdout = DefaultLog.Writer()
-	cmd.Stderr = DefaultLog.Writer()
+	cmd.Stdout = c.logger.Writer()
+	cmd.Stderr = c.logger.Writer()
 	return cmd.Run()
 }

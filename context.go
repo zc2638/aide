@@ -32,4 +32,6 @@ var (
 	StepCtxKey = &contextKey{"StepContext"}
 	// StepTotalKey is the context.Context key to store the total number of steps.
 	StepTotalKey = &contextKey{"StepTotal"}
+	// StepLoggerKey is the context.Context key to store the logger.
+	StepLoggerKey = &contextKey{"StepLogger"}
 )

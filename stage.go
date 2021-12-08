@@ -17,17 +17,19 @@
 package aide
 
 import (
-	"fmt"
 	"reflect"
 	"runtime"
+	"strings"
 
 	"github.com/zc2638/aide/stage"
 )
 
 type Stage struct {
 	instance *stage.Instance
+	logger   LogInterface
 
 	name     string
+	symbol   string
 	total    int
 	skip     bool
 	skipFunc func() bool
@@ -35,27 +37,17 @@ type Stage struct {
 
 func NewStage(name string) *Stage {
 	s := &Stage{name: name}
-	s.instance = stage.New(name).
-		SetPreFunc(func(sc stage.Context) error {
-			sc.WithValue(StepTotalKey, s.total)
-			stageName := stage.ContextName(sc)
-			DefaultLog.Logf(Unknown, "%s STAGE %s", stageSymbol, stageName)
-			return nil
-		}).
-		SetSubFunc(sub)
+	s.instance = stage.New(name)
 	return s
 }
 
-func sub(_ stage.Context) error {
-	fmt.Println()
-	return nil
+func (s *Stage) SetSymbol(symbol string) {
+	s.symbol = symbol
 }
 
-// TODO asynchronous support in the future
-//func (s *Stage) SetAsync(async bool) *Stage {
-//	s.instance.SetAsync(async)
-//	return s
-//}
+func (s *Stage) SetLogger(logger LogInterface) {
+	s.logger = logger
+}
 
 func (s *Stage) RelyOn(names ...string) *Stage {
 	s.instance.RelyOn(names...)
@@ -69,6 +61,19 @@ func (s *Stage) AddSteps(steps ...*Step) *Stage {
 		}
 		s.total++
 		step.num = s.total
+		step.stage = s
+		step.instance.SetPreFunc(func(sc stage.Context) error {
+			if len(s.symbol) == 0 {
+				return nil
+			}
+			if strings.Count(s.symbol, "%s") > 0 {
+				name := stage.ContextName(sc)
+				s.logger.Logf(Unknown, s.symbol, name)
+			} else {
+				s.logger.Logf(Unknown, s.symbol)
+			}
+			return nil
+		})
 		s.instance.Add(step.instance)
 	}
 	return s

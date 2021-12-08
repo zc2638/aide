@@ -18,25 +18,38 @@ package aide
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/zc2638/aide/stage"
 )
 
 const (
-	stageSymbol = "[+]"
-	stepSymbol  = "=>"
+	stageSymbol = "[+] STAGE %s"
+	stepSymbol  = "=> %s"
 )
 
 type Instance struct {
-	// TODO stage pre logs define
-	// TODO step pre logs define
 	instance *stage.Instance
+	logger   LogInterface
+
+	stageSymbol string
+	stepSymbol  string
+	verbose     bool
 }
 
-func New() *Instance {
-	return &Instance{
-		instance: stage.New(""),
+func New(opts ...InstanceOption) *Instance {
+	ins := &Instance{
+		instance:    stage.New(""),
+		stageSymbol: stageSymbol,
+		stepSymbol:  stepSymbol,
+		verbose:     true,
 	}
+	for _, opt := range opts {
+		opt(ins)
+	}
+	ins.logger = newLog(ins.verbose)
+	return ins
 }
 
 func (i *Instance) AddStages(stages ...*Stage) *Instance {
@@ -44,8 +57,13 @@ func (i *Instance) AddStages(stages ...*Stage) *Instance {
 		if s == nil {
 			continue
 		}
-		ins := s.instance.Skip(s.skip).SkipFunc(s.skipFunc)
-		i.instance.Add(ins)
+		s.SetLogger(i.logger)
+		s.SetSymbol(i.stepSymbol)
+		s.instance.SetPreFunc(i.buildPre(s))
+		s.instance.SetSubFunc(sub)
+		s.instance.Skip(s.skip)
+		s.instance.SkipFunc(s.skipFunc)
+		i.instance.Add(s.instance)
 	}
 	return i
 }
@@ -55,4 +73,46 @@ func (i *Instance) Run(ctx context.Context) error {
 		ctx = context.Background()
 	}
 	return i.instance.Run(ctx)
+}
+
+func (i *Instance) buildPre(s *Stage) func(sc stage.Context) error {
+	return func(sc stage.Context) error {
+		sc.WithValue(StepTotalKey, s.total)
+		stageName := stage.ContextName(sc)
+		if len(i.stageSymbol) == 0 {
+			return nil
+		}
+		if strings.Count(i.stageSymbol, "%s") > 0 {
+			i.logger.Logf(Unknown, i.stageSymbol, stageName)
+		} else {
+			i.logger.Log(Unknown, i.stageSymbol)
+		}
+		return nil
+	}
+}
+
+func sub(_ stage.Context) error {
+	fmt.Println()
+	return nil
+}
+
+type InstanceOption func(i *Instance)
+
+func NewSymbolOption(stage string, step string) InstanceOption {
+	return func(i *Instance) {
+		i.stageSymbol = stage
+		i.stepSymbol = step
+	}
+}
+
+func NewVerboseOption(verbose bool) InstanceOption {
+	return func(i *Instance) {
+		i.verbose = verbose
+	}
+}
+
+func NewLogOption(log LogInterface) InstanceOption {
+	return func(i *Instance) {
+		i.logger = log
+	}
 }

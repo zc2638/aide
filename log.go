@@ -44,17 +44,13 @@ const (
 	InfoLevel
 )
 
-func init() {
-	DefaultLog = newLog()
-}
-
-var DefaultLog LogInterface
+var _ LogInterface = (*defaultLog)(nil)
 
 type defaultLog struct {
 	entry *logrus.Logger
 }
 
-func newLog() LogInterface {
+func newLog(verbose bool) LogInterface {
 	logger := logrus.New()
 	logger.SetFormatter(&logrus.TextFormatter{
 		ForceColors:            true,
@@ -64,6 +60,9 @@ func newLog() LogInterface {
 		//FullTimestamp:          true,
 		//TimestampFormat: "2006/01/02 15:04:05",
 	})
+	if !verbose {
+		logger.SetOutput(&emptyWriter{})
+	}
 	return &defaultLog{entry: logger}
 }
 
@@ -106,4 +105,10 @@ func standardMessage(s string) string {
 		s = string(rs)
 	}
 	return s
+}
+
+type emptyWriter struct{}
+
+func (w *emptyWriter) Write(b []byte) (int, error) {
+	return 0, nil
 }
