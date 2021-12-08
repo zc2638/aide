@@ -110,5 +110,5 @@ func standardMessage(s string) string {
 type emptyWriter struct{}
 
 func (w *emptyWriter) Write(b []byte) (int, error) {
-	return 0, nil
+	return len(b), nil
 }
