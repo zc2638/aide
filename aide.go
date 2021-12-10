@@ -98,20 +98,20 @@ func sub(_ stage.Context) error {
 
 type InstanceOption func(i *Instance)
 
-func NewSymbolOption(stage string, step string) InstanceOption {
+func WithSymbolOption(stage string, step string) InstanceOption {
 	return func(i *Instance) {
 		i.stageSymbol = stage
 		i.stepSymbol = step
 	}
 }
 
-func NewVerboseOption(verbose bool) InstanceOption {
+func WithVerboseOption(verbose bool) InstanceOption {
 	return func(i *Instance) {
 		i.verbose = verbose
 	}
 }
 
-func NewLogOption(log LogInterface) InstanceOption {
+func WithLogOption(log LogInterface) InstanceOption {
 	return func(i *Instance) {
 		i.logger = log
 	}

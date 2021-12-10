@@ -54,6 +54,12 @@ func (s *Stage) RelyOn(names ...string) *Stage {
 	return s
 }
 
+func (s *Stage) AddStepFunc(name string, sf StepFunc) *Stage {
+	step := sf.Step(name)
+	s.AddSteps(step)
+	return s
+}
+
 func (s *Stage) AddSteps(steps ...*Step) *Stage {
 	for _, step := range steps {
 		if step == nil {
