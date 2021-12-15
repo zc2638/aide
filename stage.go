@@ -25,8 +25,11 @@ import (
 )
 
 type Stage struct {
+	logger LogInterface
+
 	instance *stage.Instance
-	logger   LogInterface
+	preFunc  stage.InstanceFunc
+	subFunc  stage.InstanceFunc
 
 	name     string
 	symbol   string
@@ -47,6 +50,14 @@ func (s *Stage) SetSymbol(symbol string) {
 
 func (s *Stage) SetLogger(logger LogInterface) {
 	s.logger = logger
+}
+
+func (s *Stage) SetPreFunc(f stage.InstanceFunc) {
+	s.preFunc = f
+}
+
+func (s *Stage) SetSubFunc(f stage.InstanceFunc) {
+	s.subFunc = f
 }
 
 func (s *Stage) RelyOn(names ...string) *Stage {
