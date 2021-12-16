@@ -57,14 +57,16 @@ func (i *Instance) AddStages(stages ...*Stage) *Instance {
 		if s == nil {
 			continue
 		}
-		if s.preFunc == nil {
-			s.instance.SetPreFunc(i.buildPre(s))
-		}
-		if s.subFunc == nil {
-			s.instance.SetSubFunc(sub)
-		}
 		s.SetLogger(i.logger)
 		s.SetSymbol(i.stepSymbol)
+		if s.preFunc == nil {
+			s.preFunc = i.buildPre(s)
+		}
+		if s.subFunc == nil {
+			s.subFunc = sub
+		}
+		s.instance.SetPreFunc(s.preFunc)
+		s.instance.SetSubFunc(s.subFunc)
 		s.instance.Skip(s.skip)
 		s.instance.SkipFunc(s.skipFunc)
 		i.instance.Add(s.instance)
