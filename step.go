@@ -174,6 +174,11 @@ func (c *StepContext) Shell(command string) error {
 	return c.Exec("sh", "-c", command)
 }
 
+// Bash helps execute bash scripts.
+func (c *StepContext) Bash(command string) error {
+	return c.Exec("bash", "-c", command)
+}
+
 // Exec helps execute command scripts.
 func (c *StepContext) Exec(name string, arg ...string) error {
 	cmd := exec.CommandContext(c.Context(), name, arg...)
