@@ -171,7 +171,12 @@ func (c *StepContext) WithContext(ctx context.Context) {
 
 // Shell helps execute shell scripts.
 func (c *StepContext) Shell(command string) error {
-	cmd := exec.CommandContext(c.Context(), "sh", "-c", command)
+	return c.Exec("sh", "-c", command)
+}
+
+// Exec helps execute command scripts.
+func (c *StepContext) Exec(name string, arg ...string) error {
+	cmd := exec.CommandContext(c.Context(), name, arg...)
 	cmd.Stdout = c.logger.Writer()
 	cmd.Stderr = c.logger.Writer()
 	return cmd.Run()
