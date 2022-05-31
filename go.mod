@@ -3,9 +3,13 @@ module github.com/zc2638/aide
 go 1.17
 
 require (
-	github.com/99nil/go v0.0.0-20210924013233-ebd290da12d6
-	github.com/sirupsen/logrus v1.8.1
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	github.com/99nil/gopkg v0.0.0-20220531085926-60afce00972b
+	github.com/sirupsen/logrus v1.6.0
+	golang.org/x/sync v0.0.0-20220513210516-0976fa681c29
 )
 
-require golang.org/x/sys v0.0.0-20210927052749-1cf2251ac284 // indirect
+require (
+	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
+	github.com/stretchr/testify v1.7.1 // indirect
+	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
+)

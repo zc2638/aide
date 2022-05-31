@@ -21,10 +21,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/99nil/gopkg/cycle"
+	"github.com/99nil/gopkg/sets"
 	"golang.org/x/sync/errgroup"
-
-	"github.com/99nil/go/cycle"
-	"github.com/99nil/go/sets"
 )
 
 type InstanceFunc func(c Context) error
@@ -81,9 +80,7 @@ func (ins *Instance) SkipFunc(f func() bool) *Instance {
 
 // Add adds subsets
 func (ins *Instance) Add(cs ...*Instance) *Instance {
-	for _, c := range cs {
-		ins.cs = append(ins.cs, c)
-	}
+	ins.cs = append(ins.cs, cs...)
 	return ins
 }
 
