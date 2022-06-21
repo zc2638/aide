@@ -19,9 +19,9 @@ package aide
 import (
 	"fmt"
 	"io"
+	"log"
+	"os"
 	"unicode"
-
-	"github.com/sirupsen/logrus"
 )
 
 type LogInterface interface {
@@ -47,52 +47,47 @@ const (
 var _ LogInterface = (*defaultLog)(nil)
 
 type defaultLog struct {
-	entry *logrus.Logger
+	entry *log.Logger
 }
 
 func newLog(verbose bool) LogInterface {
-	logger := logrus.New()
-	logger.SetFormatter(&logrus.TextFormatter{
-		ForceColors:            true,
-		DisableLevelTruncation: true,
-		PadLevelText:           true,
-		DisableTimestamp:       true,
-		//FullTimestamp:          true,
-		//TimestampFormat: "2006/01/02 15:04:05",
-	})
+	entry := log.New(os.Stderr, "", 0)
 	if !verbose {
-		logger.SetOutput(&emptyWriter{})
+		entry.SetOutput(&emptyWriter{})
 	}
-	return &defaultLog{entry: logger}
+	return &defaultLog{entry: entry}
 }
 
 func (l *defaultLog) Writer() io.Writer {
-	return l.entry.Out
+	return l.entry.Writer()
 }
 
 func (l *defaultLog) Log(level LogLevel, args ...interface{}) {
 	switch level {
 	case ErrorLevel:
-		l.entry.Errorln(args...)
+		v := append([]interface{}{"ERROR"}, args...)
+		l.entry.Println(v...)
 	case WarnLevel:
-		l.entry.Warningln(args...)
+		v := append([]interface{}{"WARN "}, args...)
+		l.entry.Println(v...)
 	case InfoLevel:
-		l.entry.Infoln(args...)
+		v := append([]interface{}{"INFO "}, args...)
+		l.entry.Println(v...)
 	default:
-		fmt.Println(args...)
+		l.entry.Println(args...)
 	}
 }
 
 func (l *defaultLog) Logf(level LogLevel, format string, args ...interface{}) {
 	switch level {
 	case ErrorLevel:
-		l.entry.Errorf(format, args...)
+		l.entry.Println("ERROR", fmt.Sprintf(format, args...))
 	case WarnLevel:
-		l.entry.Warningf(format, args...)
+		l.entry.Println("WARN ", fmt.Sprintf(format, args...))
 	case InfoLevel:
-		l.entry.Infof(format, args...)
+		l.entry.Println("INFO ", fmt.Sprintf(format, args...))
 	default:
-		fmt.Println(fmt.Sprintf(format, args...))
+		l.entry.Printf(format, args...)
 	}
 }
 

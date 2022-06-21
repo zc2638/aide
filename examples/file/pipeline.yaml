@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pipeline
+metadata:
+  name: test
+  labels:
+    project: aide
+    version: v1
+spec:
+  prompts:
+    - name: custom_name
+      type: Input
+      message: What's your name?
+    - name: gender
+      type: Select
+      message: What's your gender?
+      enum: [ "male", "female", "unknown" ]
+  steps:
+    - name: "step1"
+      render:
+        src: examples/file/test.in
+        dest: testdata/test.out
+    - command: env
+    - command: echo $custom_name\($gender\)

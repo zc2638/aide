@@ -52,6 +52,7 @@ func New(name string) *Instance {
 	return &Instance{name: name}
 }
 
+// nolint
 func (ins *Instance) rename() {
 	ns := sets.NewString()
 	for _, c := range ins.cs {
@@ -114,19 +115,6 @@ func (ins *Instance) RelyOn(names ...string) *Instance {
 func (ins *Instance) Goto(name string) *Instance {
 	ins.next = name
 	return ins
-}
-
-// getChildNames gets the names of all subsets.
-func (ins *Instance) getChildNames() []string {
-	csLen := len(ins.cs)
-	if csLen == 0 {
-		return nil
-	}
-	res := make([]string, 0, csLen)
-	for _, c := range ins.cs {
-		res = append(res, c.name)
-	}
-	return res
 }
 
 // hasLoop checks whether there is a circular dependency.

@@ -112,11 +112,6 @@ type StepContext struct {
 	err error
 }
 
-func (c *StepContext) clear() {
-	c.level = Unknown
-	c.err = nil
-}
-
 func (c *StepContext) Log(args ...interface{}) {
 	c.Logl(InfoLevel, args...)
 }

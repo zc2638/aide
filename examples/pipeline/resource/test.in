@@ -1,0 +1,2 @@
+{{.env.select1}}
+{{.env.multi_select1}}
