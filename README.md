@@ -26,11 +26,17 @@ Supported prompt types:
 
 ### 1. Installation tool
 
-#### For normal
+#### For Normal
 
 Download from [Releases](https://github.com/zc2638/aide/releases)
 
-#### For gopher
+#### For Bash Script
+
+```shell
+curl https://raw.githubusercontent.com/zc2638/aide/main/install.sh | bash
+```
+
+#### For Gopher
 
 ```shell
 go install github.com/zc2638/aide/cmd/aide@latest
