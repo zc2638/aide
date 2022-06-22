@@ -211,6 +211,13 @@ func (p *Pipeline) Validate() error {
 
 func (p *Pipeline) Execute(ctx context.Context) error {
 	envSet := make(map[string]string)
+
+	originEnv := os.Environ()
+	for _, env := range originEnv {
+		parts := strings.Split(env, "=")
+		envSet[parts[0]] = envSet[parts[1]]
+	}
+
 	for k, v := range p.Metadata.Labels {
 		envSet[k] = v
 	}
