@@ -36,6 +36,11 @@ Download from [Releases](https://github.com/zc2638/aide/releases)
 curl https://raw.githubusercontent.com/zc2638/aide/main/install.sh | bash
 ```
 
+#### For Bash Script (Proxy)
+```shell
+curl https://ghproxy.com/raw.githubusercontent.com/zc2638/aide/main/install.sh | bash
+```
+
 #### For Gopher
 
 ```shell
